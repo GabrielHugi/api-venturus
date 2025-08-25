@@ -1,5 +1,6 @@
 // server.js ou app.js
 import express from 'express';
+import models from './models/Modelos.js'
 
 const app = express();
 const PORT = 3000;
