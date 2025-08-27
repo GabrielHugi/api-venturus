@@ -14,7 +14,7 @@ done:
 7 - no
 8 - no
 9 - yes
-10 - no
+10 - yes
 11 - yes
 12 - yes
 
@@ -222,8 +222,9 @@ obs: o giovanni is stupid
 app.delete("/admin/animais/:id", async (req, res) => {
   try {
     const {email, senha} = req.body; const {id} = req.params;
-    if (!email || !senha) return res.status(400).send({"error": "Inclua email e senha no body da request"});
-    const animal = await Animal.findOne({where:{id: id}})
+    if (!email || !senha) return res.status(400).json({"error": "Inclua email e senha no body da request"});
+    if (!id) return res.status(400).send({"error": "Inclua o ID do animal na rota"});
+    const animal = await Animal.findOne({where:{id: id}});
     if (!animal) return res.status(401).json({"erro": "Animal não encontrado"});
     const user = await Usuario.findOne({ where: { email: email } });
     const decryptedPassword = decrypt(user.senha, secretKey, 256);
@@ -231,15 +232,44 @@ app.delete("/admin/animais/:id", async (req, res) => {
     animal.destroy();
     return res.status(204).end();
   } catch (err) {
-    res.status(500).json({"erro": "Erro ao remover animal"})
+    res.status(500).json({"erro": "Erro ao remover animal"});
   }
 })
+
+app.get("/animais/:id", async (req, res) => {
+  try {
+    const {email, senha} = req.query; const {id} = req.params;
+    if (!id) return res.status(400).send({"error": "Inclua o ID do animal na rota"});
+    if (!email || !senha) return res.status(400).json({"error": "Inclua email e senha no body da request"});
+
+    const user = await Usuario.findOne({ where: { email: email } });
+    const decryptedPassword = decrypt(user.senha, secretKey, 256);
+    if (senha !== decryptedPassword || !user.administrador) return res.status(403).json({ erro: "Acesso não autorizado" });
+
+    const animal = await Animal.findOne({
+      where: { id },
+      include: [
+        {
+          model: PedidoAdocao,
+          as: "pedidos",
+          attributes: ["id"], // only return the pedido ID
+        },
+      ],
+      attributes: { exclude: ["createdAt", "updatedAt"] }, // hide these from the animal
+      order: [[{ model: PedidoAdocao, as: "pedidos" }, "createdAt", "ASC"]], // order pedidos
+    });
+    if (!animal) return res.status(404).json({"erro": "Animal não encontrado"});
+    return res.status(200).json(animal);
+  } catch (err) {
+    res.status(500).json({"erro": "Erro ao achar animal"})
+  }
+});
 
 
 app.post('/autenticacao', async (req, res) => {
   try {
     const { email, senha } = req.body;
-    if (!email|| !senha) res.status(400).send({"error": "Missing email and or password in request body"});
+    if (!email|| !senha) res.status(400).json({"error": "Missing email and or password in request body"});
 
     const user = await Usuario.findOne({ where: { email: email } });
 
