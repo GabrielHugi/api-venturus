@@ -228,15 +228,69 @@ obs: o giovanni is stupid
 */ 
 
 (async () => {
-  const teste = await Usuario.findOne({where: {nome_completo: "Hugi based"}});
+  const teste = await Animal.findOne({where: {nome: "Totó"}});
   console.log("hey boy\n" + teste.id);
 })();
+
+
+//7
+// 7
+app.patch("/admin/animais/:id", async (req, res) => {
+  try {
+    const { email, senha, ...dados } = req.body;
+    const { id } = req.params;
+
+    if (!email || !senha) {
+      return res.status(400).json({ erro: "Inclua email e senha no body da request" });
+    }
+
+    const usuario = await Usuario.findOne({ where: { email } });
+    if (!usuario) {
+      return res.status(403).json({ erro: "Usuário não encontrado" });
+    }
+    const decryptedPassword = decrypt(usuario.senha, secretKey, 256);
+    if (senha !== decryptedPassword || !usuario.administrador) {
+      return res.status(403).json({ erro: "Acesso não autorizado" });
+    }
+
+    const animal = await Animal.findOne({ where: { id } });
+    if (!animal) {
+      return res.status(404).json({ erro: "Animal não encontrado" });
+    }
+
+    // Filtrar os campos permitidos
+    const camposPermitidos = ["nome", "castrado", "vacinado", "adotado", "descricao"];
+    const camposParaAtualizar = {};
+    for (const campo of camposPermitidos) {
+      if (campo in dados) {
+        camposParaAtualizar[campo] = dados[campo];
+      }
+    }
+    if (Object.keys(camposParaAtualizar).length === 0) {
+      return res.status(400).json({ erro: "Nenhum campo foi fornecido para atualização" });
+    }
+    await animal.update(camposParaAtualizar);
+    return res.status(200).json({
+      id: animal.id,
+      nome: animal.nome,
+      castrado: animal.castrado,
+      vacinado: animal.vacinado,
+      adotado: animal.adotado,
+      descricao: animal.descricao,
+      updated_at: animal.updatedAt
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ erro: "Erro ao atualizar o animal" });
+  }
+});
 
 // 8
 app.get("/tutores/:id", async (req, res) => {
   try {
     const {id} = req.params;
-    if (!id) return res.status(400).send({"error": "Inclua o ID do animal na rota"});
+    if (!id) return res.status(400).send({"error": "Inclua o ID do tutor na rota"});
 
     const user = await Usuario.findOne({
       where: { id:id },
@@ -250,10 +304,10 @@ app.get("/tutores/:id", async (req, res) => {
       attributes: { exclude: ["createdAt", "updatedAt", "senha"] },
       order: [[{ model: Questionario, as: "questionario" }, "createdAt", "ASC"]],
     });
-    if (!user) return res.status(404).json({"erro": "Animal não encontrado"});
+    if (!user) return res.status(404).json({"erro": "Tutor não encontrado"});
     return res.status(200).json(user);
   } catch (err) {
-    res.status(500).json({"erro": "Erro ao achar animal"})
+    res.status(500).json({"erro": "Erro ao buscar dados do tutor"})
   }
 });
 
