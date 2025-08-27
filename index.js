@@ -56,7 +56,6 @@ const secretKey = "ultra-mega-secret-key-because-of-course-why-hashing-right-jus
 
 app.use(express.json());
 
-
 (async () => {
   try {
     // encrypt the password
@@ -79,6 +78,16 @@ app.use(express.json());
     console.error("Erro criando usuário:", err);
   }
 })();
+
+/*
+ ___      ___   ________                   _____      _____   ________  
+|   |    |   |     |        /\            |          |           |
+|__ |    |   |     |       /  \   -----   |  ___     |_____      |
+|  \     |   |     |      /----\          |     |    |           |
+|   \    |___|     |     /      \         |_____|    |_____      |
+obs: o giovanni is stupid
+*/ 
+
 
 
 app.post('/autenticacao', async (req, res) => {
@@ -133,7 +142,6 @@ app.post('/doacoes', async (req, res) => {
     return res.status(500).json({"erro": "Erro ao processar a doação"});
   }
 })
-
 
 
 app.listen(PORT, () => {
