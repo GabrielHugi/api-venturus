@@ -132,58 +132,71 @@ app.use(express.json());
 })();
 
 (async () => {
-  try {
-    const questionario = await Questionario.create({
-      empregado: true,
-      quantos_animais_possui: 2,
-      motivos_para_adotar: "Procurando um animal de estimação",
-      quem_vai_sustentar_o_animal: "Eu",
-      numero_adultos_na_casa: 2,
-      numero_criancas_na_casa: 1,
-      idades_criancas: [5],
-      residencia_tipo: "Casa",
-      proprietario_permite_animais: true,
-      todos_de_acordo_com_adocao: true,
-      responsavel_pelo_animal: "Joana Silva",
-      responsavel_concorda_com_adocao: true,
-      ha_alergico_ou_pessoas_que_nao_gostam: false,
-      gasto_mensal_estimado: 500,
-      valor_disponivel_no_orcamento: true,
-      tipo_alimentacao: "Ração seca",
-      local_que_o_animal_vai_ficar: "Quarto",
-      forma_de_permanencia: "Livre",
-      forma_de_confinamento: "Cercado",
-      tera_brinquedos: true,
-      tera_abrigo: true,
-      tera_passeios_acompanhado: true,
-      tera_passeios_sozinho: false,
-      companhia_outro_animal: true,
-      companhia_humana_24h: true,
-      companhia_humana_parcial: false,
-      sem_companhia_humana: false,
-      sem_companhia_animal: false,
-      o_que_faz_em_viagem: "Levar para um hotel de animais",
-      o_que_faz_se_fugir: "Procurar e chamar",
-      o_que_faz_se_nao_puder_criar: "Buscar um novo lar",
-      animais_que_ja_criou: "Cachorros e gatos",
-      destino_animais_anteriores: "Adotados com sucesso",
-      costuma_esterilizar: true,
-      costuma_vacinar: true,
-      costuma_vermifugar: true,
-      veterinario_usual: "Veterinário local",
-      forma_de_educar: "Comando positivo",
-      envia_fotos_e_videos_do_local: true,
-      aceita_visitas_e_fotos_do_animal: true,
-      topa_entrar_grupo_adotantes: true,
-      concorda_com_taxa_adocao: true,
-      data_disponivel_para_buscar_animal: "2025-09-01"
-    });
-
-    //console.log("Questionario criado:", questionario.toJSON());
-  } catch (err) {
-    //console.error("Erro criando Questionario:", err);
-  }
-})();
+    try {
+      const usuario = await Usuario.findOne({
+        where: {
+          email: '<hugi@gmail.com>'
+        }
+      });
+  
+      if (!usuario) {
+        console.error("Usuário não encontrado para vincular ao questionário.");
+        return;
+      }
+  
+      const questionario = await Questionario.create({
+        usuarioId: usuario.id, // <- aqui conectamos
+        empregado: true,
+        quantos_animais_possui: 2,
+        motivos_para_adotar: "Procurando um animal de estimação",
+        quem_vai_sustentar_o_animal: "Eu",
+        numero_adultos_na_casa: 2,
+        numero_criancas_na_casa: 1,
+        idades_criancas: [5],
+        residencia_tipo: "Casa",
+        proprietario_permite_animais: true,
+        todos_de_acordo_com_adocao: true,
+        responsavel_pelo_animal: "Joana Silva",
+        responsavel_concorda_com_adocao: true,
+        ha_alergico_ou_pessoas_que_nao_gostam: false,
+        gasto_mensal_estimado: 500,
+        valor_disponivel_no_orcamento: true,
+        tipo_alimentacao: "Ração seca",
+        local_que_o_animal_vai_ficar: "Quarto",
+        forma_de_permanencia: "Livre",
+        forma_de_confinamento: "Cercado",
+        tera_brinquedos: true,
+        tera_abrigo: true,
+        tera_passeios_acompanhado: true,
+        tera_passeios_sozinho: false,
+        companhia_outro_animal: true,
+        companhia_humana_24h: true,
+        companhia_humana_parcial: false,
+        sem_companhia_humana: false,
+        sem_companhia_animal: false,
+        o_que_faz_em_viagem: "Levar para um hotel de animais",
+        o_que_faz_se_fugir: "Procurar e chamar",
+        o_que_faz_se_nao_puder_criar: "Buscar um novo lar",
+        animais_que_ja_criou: "Cachorros e gatos",
+        destino_animais_anteriores: "Adotados com sucesso",
+        costuma_esterilizar: true,
+        costuma_vacinar: true,
+        costuma_vermifugar: true,
+        veterinario_usual: "Veterinário local",
+        forma_de_educar: "Comando positivo",
+        envia_fotos_e_videos_do_local: true,
+        aceita_visitas_e_fotos_do_animal: true,
+        topa_entrar_grupo_adotantes: true,
+        concorda_com_taxa_adocao: true,
+        data_disponivel_para_buscar_animal: "2025-09-01"
+      });
+  
+      console.log("Questionário criado e vinculado ao usuário Joana Silva:", questionario.toJSON());
+    } catch (err) {
+      console.error("Erro criando Questionario:", err);
+    }
+  })();
+  
 
 
 (async () => {
@@ -215,10 +228,36 @@ obs: o giovanni is stupid
 */ 
 
 (async () => {
-  const teste = await Animal.findOne({where: {nome: "Totó"}});
+  const teste = await Usuario.findOne({where: {nome_completo: "Hugi based"}});
   console.log("hey boy\n" + teste.id);
 })();
 
+// 8
+app.get("/tutores/:id", async (req, res) => {
+  try {
+    const {id} = req.params;
+    if (!id) return res.status(400).send({"error": "Inclua o ID do animal na rota"});
+
+    const user = await Usuario.findOne({
+      where: { id:id },
+      include: [
+        {
+          model: Questionario,
+          as: "questionario",
+          attributes: { exclude: ["createdAt", "updatedAt"] },
+        },
+      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "senha"] },
+      order: [[{ model: Questionario, as: "questionario" }, "createdAt", "ASC"]],
+    });
+    if (!user) return res.status(404).json({"erro": "Animal não encontrado"});
+    return res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({"erro": "Erro ao achar animal"})
+  }
+});
+
+// 9
 app.delete("/admin/animais/:id", async (req, res) => {
   try {
     const {email, senha} = req.body; const {id} = req.params;
@@ -236,6 +275,7 @@ app.delete("/admin/animais/:id", async (req, res) => {
   }
 })
 
+// 10
 app.get("/animais/:id", async (req, res) => {
   try {
     const {email, senha} = req.query; const {id} = req.params;
@@ -265,7 +305,7 @@ app.get("/animais/:id", async (req, res) => {
   }
 });
 
-
+// 11
 app.post('/autenticacao', async (req, res) => {
   try {
     const { email, senha } = req.body;
@@ -285,7 +325,7 @@ app.post('/autenticacao', async (req, res) => {
   }
 });
 
-
+// 12
 app.post('/doacoes', async (req, res) => {
   try {
     const {nome, email, valor, mensagem} = req.body;
