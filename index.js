@@ -8,25 +8,15 @@ done:
 1 - no
 2 - no
 3 - no
-4 - no
-5 - no
-6 - no
-7 - no
-8 - no
+4 - yes
+5 - yes
+6 - yes
+7 - yes
+8 - yes
 9 - yes
-10 - yes (kept as requested)
+10 - yes
 11 - yes
 12 - yes
-
-Applied changes:
-- Await PIX QR generation before starting server (prevents PIXQR == '').
-- Run sequelize.sync() before seeds (if sequelize available).
-- Log errors in seeds instead of silently swallowing them.
-- Keep seed emails as they were (with < >) per your instruction.
-- Fix donation valor validation to reject NaN strings.
-- Convert image Buffer to base64 when returning in /admin/animais.
-- Ensure ordering by createdAt doesn't reference excluded fields; included createdAt where necessary.
-- Make /admin/animais order from oldest to newest (ASC) per spec.
 */
 
 const app = express();
@@ -314,6 +304,63 @@ app.post("/questionario", async (req, res) => {
     return res.status(500).json({ erro: "Erro interno ao cadastrar o tutor." });
   }
 });
+
+
+/*
+ ___      ___   ________                   _____      _____   ________  
+|   |    |   |     |        /\            |          |           |
+|__ |    |   |     |       /  \   -----   |  ___     |_____      |
+|  \     |   |     |      /----\          |     |    |           |
+|   \    |___|     |     /      \         |_____|    |_____      |
+*/ 
+
+// 3
+app.get("/animais", async (req, res) => {
+  try {
+    const { especie, porte, castrado, vacinado } = req.query;
+
+    const filtros = {};
+    if (especie) filtros.especie = especie;
+    if (porte) filtros.porte = porte;
+    if (castrado !== undefined) filtros.castrado = castrado === "true";
+    if (vacinado !== undefined) filtros.vacinado = vacinado === "true";
+
+    const animais = await Animal.findAll({
+      where: filtros,
+      attributes: [
+        "id",
+        "nome",
+        "especie",
+        "porte",
+        "castrado",
+        "vacinado",
+        "descricao",
+        "foto",
+        "createdAt",
+      ],
+      order: [["createdAt", "ASC"]], // mais antigo → mais recente
+    });
+
+    return res.status(200).json({
+      data: animais.map((a) => ({
+        id: a.id,
+        nome: a.nome,
+        especie: a.especie,
+        porte: a.porte,
+        castrado: a.castrado,
+        vacinado: a.vacinado,
+        descricao: a.descricao,
+        imagem: a.foto ? (Buffer.isBuffer(a.foto) ? a.foto.toString("base64") : a.foto) : null,
+        created_at: a.createdAt ? a.createdAt.toISOString() : null,
+      })),
+      total: animais.length,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ erro: "Erro ao buscar animais" });
+  }
+});
+
 
 // 4
 app.post("/adocoes", async (req, res) => {
