@@ -6,8 +6,8 @@ import encryptjs from "encryptjs";
 /*
 done:
 1 - no
-2 - no
-3 - no
+2 - yes
+3 - yes
 4 - yes
 5 - yes
 6 - yes
@@ -26,7 +26,7 @@ var PIXQR = '';
 const encrypt = encryptjs.encrypt;
 const decrypt = encryptjs.decrypt;
 
-const secretKey = "ultra-mega-secret-key-because-of-course-why-hashing-right-just-encrypt-it-i-guess";
+const secretKey = "very very secret secretive secretus";
 
 app.use(express.json());
 
@@ -164,17 +164,16 @@ app.post("/usuarios", async (req, res) => {
       telefone,
       instagram,
       facebook,
-      questionario // opcional, objeto
+      questionario
     } = req.body;
 
-    // Campos obrigatórios do usuário
     if (
       !nome_completo ||
       !senha ||
       !email ||
       !cidade ||
       !estado ||
-      idade == null ||
+      !idade  ||
       !telefone
     ) {
       return res.status(400).json({ erro: "Todos os campos obrigatórios devem ser preenchidos corretamente." });
@@ -184,19 +183,6 @@ app.post("/usuarios", async (req, res) => {
     const emailExistente = await Usuario.findOne({ where: { email } });
     if (emailExistente) {
       return res.status(400).json({ erro: "Email preenchido já está sendo utilizado." });
-    }
-
-    // Validação questionário se enviado (exemplo simplificado)
-    if (questionario) {
-      // Exemplo: verificar campos obrigatórios do questionário
-      if (
-        questionario.empregado == null ||
-        questionario.quantos_animais_possui == null ||
-        !questionario.motivos_para_adotar
-        // continue com os campos obrigatórios que você tem...
-      ) {
-        return res.status(400).json({ erro: "Todos os campos obrigatórios devem ser preenchidos corretamente." });
-      }
     }
 
     // Criar usuário
@@ -296,13 +282,52 @@ app.post("/questionario", async (req, res) => {
       return res.status(400).json({ erro: "Usuário não encontrado." });
     }
 
-    // Verificação básica campos obrigatórios (exemplo, adapte)
     if (
-      empregado == null ||
-      quantos_animais_possui == null ||
-      !motivos_para_adotar ||
-      !quem_vai_sustentar_o_animal
-      // Adicione os demais campos obrigatórios da lista
+      !usuarioId  ||
+      !empregado  ||
+      !quantos_animais_possui  ||
+      !motivos_para_adotar  ||
+      !quem_vai_sustentar_o_animal  ||
+      !numero_adultos_na_casa  ||
+      !numero_criancas_na_casa  ||
+      !idades_criancas  ||
+      !residencia_tipo  ||
+      !proprietario_permite_animais  ||
+      !todos_de_acordo_com_adocao  ||
+      !responsavel_pelo_animal  ||
+      !responsavel_concorda_com_adocao  ||
+      !ha_alergico_ou_pessoas_que_nao_gostam  ||
+      !gasto_mensal_estimado  ||
+      !valor_disponivel_no_orcamento  ||
+      !tipo_alimentacao  ||
+      !local_que_o_animal_vai_ficar  ||
+      !forma_de_permanencia  ||
+      !forma_de_confinamento  ||
+      !tera_brinquedos  ||
+      !tera_abrigo  ||
+      !tera_passeios_acompanhado  ||
+      !tera_passeios_sozinho  ||
+      !companhia_outro_animal  ||
+      !companhia_humana_24h  ||
+      !companhia_humana_parcial  ||
+      !sem_companhia_humana  ||
+      !sem_companhia_animal  ||
+      !o_que_faz_em_viagem  ||
+      !o_que_faz_se_fugir  ||
+      !o_que_faz_se_nao_puder_criar  ||
+      !animais_que_ja_criou  ||
+      !destino_animais_anteriores  ||
+      !costuma_esterilizar  ||
+      !costuma_vacinar  ||
+      !costuma_vermifugar  ||
+      !veterinario_usual  ||
+      !forma_de_educar  ||
+      !envia_fotos_e_videos_do_local  ||
+      !aceita_visitas_e_fotos_do_animal  ||
+      !topa_entrar_grupo_adotantes  ||
+      !concorda_com_taxa_adocao  ||
+      !data_disponivel_para_buscar_animal
+      
     ) {
       return res.status(400).json({ erro: "Todos os campos obrigatórios devem ser preenchidos corretamente." });
     }
@@ -362,6 +387,63 @@ app.post("/questionario", async (req, res) => {
   }
 });
 
+
+/*
+ ___      ___   ________                   _____      _____   ________  
+|   |    |   |     |        /\            |          |           |
+|__ |    |   |     |       /  \   -----   |  ___     |_____      |
+|  \     |   |     |      /----\          |     |    |           |
+|   \    |___|     |     /      \         |_____|    |_____      |
+*/ 
+
+// 3
+app.get("/animais", async (req, res) => {
+  try {
+    const { especie, porte, castrado, vacinado } = req.query;
+
+    const filtros = {};
+    if (especie) filtros.especie = especie;
+    if (porte) filtros.porte = porte;
+    if (castrado !== undefined) filtros.castrado = castrado === "true";
+    if (vacinado !== undefined) filtros.vacinado = vacinado === "true";
+
+    const animais = await Animal.findAll({
+      where: filtros,
+      attributes: [
+        "id",
+        "nome",
+        "especie",
+        "porte",
+        "castrado",
+        "vacinado",
+        "descricao",
+        "foto",
+        "createdAt",
+      ],
+      order: [["createdAt", "ASC"]],
+    });
+
+    return res.status(200).json({
+      data: animais.map((a) => ({
+        id: a.id,
+        nome: a.nome,
+        especie: a.especie,
+        porte: a.porte,
+        castrado: a.castrado,
+        vacinado: a.vacinado,
+        descricao: a.descricao,
+        imagem: a.foto ? (Buffer.isBuffer(a.foto) ? a.foto.toString("base64") : a.foto) : null,
+        created_at: a.createdAt ? a.createdAt.toISOString() : null,
+      })),
+      total: animais.length,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ erro: "Erro ao buscar animais" });
+  }
+});
+
+
 // 4
 app.post("/adocoes", async (req, res) => {
   try {
@@ -386,7 +468,7 @@ app.post("/adocoes", async (req, res) => {
     if (animal.adotado) return res.status(400).json({ erro: "Animal já está adotado" });
 
     let pedido;
-    const sequelize = PedidoAdocao && PedidoAdocao.sequelize ? PedidoAdocao.sequelize : null;
+    const sequelize = PedidoAdocao && (PedidoAdocao.sequelize ? PedidoAdocao.sequelize : null);
     if (sequelize) {
       const t = await sequelize.transaction();
       try {
@@ -748,6 +830,7 @@ app.post('/doacoes', async (req, res) => {
 })
 
 // init seeds sequelize
+// it also has the test shit
 async function init() {
   const sequelize = (Usuario && Usuario.sequelize) || (Animal && Animal.sequelize) || (PedidoAdocao && PedidoAdocao.sequelize) || null;
 
