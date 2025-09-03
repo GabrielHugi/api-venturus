@@ -8,16 +8,15 @@ done:
 1 - no
 2 - no
 3 - no
-4 - no
-5 - no
-6 - no
-7 - no
-8 - no
+4 - yes
+5 - yes
+6 - yes
+7 - yes
+8 - yes
 9 - yes
 10 - yes
 11 - yes
 12 - yes
-
 */
 
 const app = express();
