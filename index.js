@@ -64,6 +64,63 @@ async function requireAdmin(email, senha) {
 
 // ROUTES
 
+
+/*
+ ___      ___   ________                   _____      _____   ________  
+|   |    |   |     |        /\            |          |           |
+|__ |    |   |     |       /  \   -----   |  ___     |_____      |
+|  \     |   |     |      /----\          |     |    |           |
+|   \    |___|     |     /      \         |_____|    |_____      |
+*/ 
+
+// 3
+app.get("/animais", async (req, res) => {
+  try {
+    const { especie, porte, castrado, vacinado } = req.query;
+
+    const filtros = {};
+    if (especie) filtros.especie = especie;
+    if (porte) filtros.porte = porte;
+    if (castrado !== undefined) filtros.castrado = castrado === "true";
+    if (vacinado !== undefined) filtros.vacinado = vacinado === "true";
+
+    const animais = await Animal.findAll({
+      where: filtros,
+      attributes: [
+        "id",
+        "nome",
+        "especie",
+        "porte",
+        "castrado",
+        "vacinado",
+        "descricao",
+        "foto",
+        "createdAt",
+      ],
+      order: [["createdAt", "ASC"]], // mais antigo → mais recente
+    });
+
+    return res.status(200).json({
+      data: animais.map((a) => ({
+        id: a.id,
+        nome: a.nome,
+        especie: a.especie,
+        porte: a.porte,
+        castrado: a.castrado,
+        vacinado: a.vacinado,
+        descricao: a.descricao,
+        imagem: a.foto ? (Buffer.isBuffer(a.foto) ? a.foto.toString("base64") : a.foto) : null,
+        created_at: a.createdAt ? a.createdAt.toISOString() : null,
+      })),
+      total: animais.length,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ erro: "Erro ao buscar animais" });
+  }
+});
+
+
 // 4
 app.post("/adocoes", async (req, res) => {
   try {
