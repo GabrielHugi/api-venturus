@@ -8,25 +8,15 @@ done:
 1 - no
 2 - no
 3 - no
-4 - no
-5 - no
-6 - no
-7 - no
-8 - no
+4 - yes
+5 - yes
+6 - yes
+7 - yes
+8 - yes
 9 - yes
-10 - yes (kept as requested)
+10 - yes
 11 - yes
 12 - yes
-
-Applied changes:
-- Await PIX QR generation before starting server (prevents PIXQR == '').
-- Run sequelize.sync() before seeds (if sequelize available).
-- Log errors in seeds instead of silently swallowing them.
-- Keep seed emails as they were (with < >) per your instruction.
-- Fix donation valor validation to reject NaN strings.
-- Convert image Buffer to base64 when returning in /admin/animais.
-- Ensure ordering by createdAt doesn't reference excluded fields; included createdAt where necessary.
-- Make /admin/animais order from oldest to newest (ASC) per spec.
 */
 
 const app = express();
