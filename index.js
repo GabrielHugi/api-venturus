@@ -62,6 +62,35 @@ async function requireAdmin(email, senha) {
   return { ok: true, user };
 }
 
+// 1 POST animais
+app.get("/usuarios", async (req, res) => {
+  try {
+    const usuarios = await Usuario.findAll({
+      attributes: {
+        exclude: ["senha", "createdAt", "updatedAt"]
+      },
+      include: [
+        {
+          model: Questionario,
+          as: "questionario",
+          attributes: {
+            exclude: ["createdAt", "updatedAt"]
+          }
+        }
+      ]
+    });
+
+    return res.status(200).json({
+      total: usuarios.length,
+      data: usuarios
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ erro: "Erro ao buscar usuários" });
+  }
+});
+
 // 2
 // POST /usuarios
 app.post("/usuarios", async (req, res) => {
