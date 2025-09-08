@@ -34,7 +34,6 @@ const encrypt = encryptjs.encrypt;
 const decrypt = encryptjs.decrypt;
 
 const secretKey = "very very secret secretive secretus";
-const secretKey = "very very secret secretive secretus";
 
 app.use(express.json());
 
