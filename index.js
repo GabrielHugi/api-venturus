@@ -13,6 +13,13 @@ done:
 6 - yes
 7 - yes
 8 - yes
+2 - yes
+3 - yes
+4 - yes
+5 - yes
+6 - yes
+7 - yes
+8 - yes
 9 - yes
 10 - yes
 11 - yes
@@ -26,6 +33,7 @@ var PIXQR = '';
 const encrypt = encryptjs.encrypt;
 const decrypt = encryptjs.decrypt;
 
+const secretKey = "very very secret secretive secretus";
 const secretKey = "very very secret secretive secretus";
 
 app.use(express.json());
