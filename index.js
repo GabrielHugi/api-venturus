@@ -5,7 +5,7 @@ import encryptjs from "encryptjs";
 
 /*
 done:
-1 - yes
+1 - yes - tested and it seems to work
 2 - yes
 3 - yes
 4 - yes
@@ -36,6 +36,7 @@ const decrypt = encryptjs.decrypt;
 const secretKey = "very very secret secretive secretus";
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // HELPERS
 function isValidUUID(uuid) {
@@ -69,6 +70,34 @@ async function requireAdmin(email, senha) {
   return { ok: true, user };
 }
 
+async function getRandomUserByName() {
+  try {
+    const users = await Usuario.findAll({
+      where: {
+        nome_completo: "Teste User"
+      }
+    });
+    if (users.length === 0) return null;
+
+    // Pick a random user from the results
+    const randomIndex = Math.floor(Math.random() * users.length);
+    return users[randomIndex];
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    return null;
+  }
+}
+
+getRandomUserByName().then(user => {
+  if (!user) {
+    console.log("No users found with that name.");
+  } else {
+    console.log("Random user:", user.toJSON());
+  }
+});
+
+// ROUTES
+
 // 1 POST animais
 app.post("/animais", async(req,res) => {
   try {
@@ -89,128 +118,38 @@ app.post("/animais", async(req,res) => {
       !porte ||
       !castrado ||
       !vacinado ||
-      !descricao
+      !descricao ||
+      !foto
     ) {
       return res.status(400).json({ erro: "Todos os campos obrigatórios devem ser preenchidos corretamente." });
     }
+    //Verifica se a base64 é valida
+    let fotoBuffer = null;
+    if (foto) {
+      try {
+        fotoBuffer = Buffer.from(foto, 'base64');
+      } catch (err) {
+        err.push("Campo 'foto' não é um base64 válido.");
+      }
+    }
+
+    const novoAnimal = Animal.create({
+      nome,
+      especie,
+      porte,
+      castrado: castrado === true || castrado === false, //assumindo que a entrada vai ser com base entre escolher uma opção true ou false (boolean) para a variavel castrado
+      vacinado: vacinado === true || vacinado === false, //assumindo que a entrada vai ser com base entre escolher uma opção true ou false (boolean) para a variavel vacinado
+      descricao,
+      foto: fotoBuffer
+    });
+
+    res.status(201).json({
+      mensagem: 'Animal cadastrado com sucesso!',
+      animal: { ...novoAnimal, foto: `Buffer com ${fotoBuffer.length} bytes` }
+    });
   } catch (err) {
       console.error(err);
       return res.status(500).json({ erro: "Erro interno ao cadastrar o animal." });
-  }
-
-  //Verifica se a base64 é valida
-  let fotoBuffer = null;
-  if (foto) {
-    try {
-      fotoBuffer = Buffer.from(foto, 'base64');
-    } catch (err) {
-      erros.push("Campo 'foto' não é um base64 válido.");
-    }
-  }
-
-  const novoAnimal = {
-    id: uuidv4(),
-    nome,
-    especie,
-    porte,
-    castrado: castrado === true || castrado === false, //assumindo que a entrada vai ser com base entre escolher uma opção true ou false (boolean) para a variavel castrado
-    vacinado: vacinado === true || vacinado === false, //assumindo que a entrada vai ser com base entre escolher uma opção true ou false (boolean) para a variavel vacinado
-    descricao,
-    foto: fotoBuffer
-  };
-
-  animais.push(novoAnimal);
-
-  res.status(201).json({
-    mensagem: 'Animal cadastrado com sucesso!',
-    animal: { ...novoAnimal, foto: `Buffer com ${fotoBuffer.length} bytes` }
-  });
-});
-
-// ROUTES
-
-
-/*
- ___      ___   ________                   _____      _____   ________  
-|   |    |   |     |        /\            |          |           |
-|__ |    |   |     |       /  \   -----   |  ___     |_____      |
-|  \     |   |     |      /----\          |     |    |           |
-|   \    |___|     |     /      \         |_____|    |_____      |
-*/ 
-
-// 3
-app.get("/animais", async (req, res) => {
-  try {
-    const { especie, porte, castrado, vacinado } = req.query;
-
-    const filtros = {};
-    if (especie) filtros.especie = especie;
-    if (porte) filtros.porte = porte;
-    if (castrado !== undefined) filtros.castrado = castrado === "true";
-    if (vacinado !== undefined) filtros.vacinado = vacinado === "true";
-
-    const animais = await Animal.findAll({
-      where: filtros,
-      attributes: [
-        "id",
-        "nome",
-        "especie",
-        "porte",
-        "castrado",
-        "vacinado",
-        "descricao",
-        "foto",
-        "createdAt",
-      ],
-      order: [["createdAt", "ASC"]], // mais antigo → mais recente
-    });
-
-    return res.status(200).json({
-      data: animais.map((a) => ({
-        id: a.id,
-        nome: a.nome,
-        especie: a.especie,
-        porte: a.porte,
-        castrado: a.castrado,
-        vacinado: a.vacinado,
-        descricao: a.descricao,
-        imagem: a.foto ? (Buffer.isBuffer(a.foto) ? a.foto.toString("base64") : a.foto) : null,
-        created_at: a.createdAt ? a.createdAt.toISOString() : null,
-      })),
-      total: animais.length,
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ erro: "Erro ao buscar animais" });
-  }
-});
-
-
-// Assuming you have access to your Usuario model
-async function getRandomUserByName() {
-  try {
-    const users = await Usuario.findAll({
-      where: {
-        nome_completo: "Teste User"
-      }
-    });
-    if (users.length === 0) return null;
-
-    // Pick a random user from the results
-    const randomIndex = Math.floor(Math.random() * users.length);
-    return users[randomIndex];
-  } catch (err) {
-    console.error("Error fetching user:", err);
-    return null;
-  }
-}
-
-
-getRandomUserByName().then(user => {
-  if (!user) {
-    console.log("No users found with that name.");
-  } else {
-    console.log("Random user:", user.toJSON());
   }
 });
 
@@ -291,7 +230,7 @@ app.post("/usuarios", async (req, res) => {
 });
 
 
-// POST /questionario
+// Ainda parte do 2 POST /questionario
 app.post("/questionario", async (req, res) => {
   try {
     const {
@@ -453,6 +392,7 @@ app.post("/questionario", async (req, res) => {
 });
 
 
+
 /*
  ___      ___   ________                   _____      _____   ________  
 |   |    |   |     |        /\            |          |           |
@@ -485,7 +425,7 @@ app.get("/animais", async (req, res) => {
         "foto",
         "createdAt",
       ],
-      order: [["createdAt", "ASC"]],
+      order: [["createdAt", "ASC"]], // mais antigo → mais recente
     });
 
     return res.status(200).json({
@@ -507,7 +447,6 @@ app.get("/animais", async (req, res) => {
     return res.status(500).json({ erro: "Erro ao buscar animais" });
   }
 });
-
 
 // 4
 app.post("/adocoes", async (req, res) => {
