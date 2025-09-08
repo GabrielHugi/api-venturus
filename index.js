@@ -5,7 +5,7 @@ import encryptjs from "encryptjs";
 
 /*
 done:
-1 - no
+1 - yes
 2 - yes
 3 - yes
 4 - yes
@@ -70,32 +70,61 @@ async function requireAdmin(email, senha) {
 }
 
 // 1 POST animais
-app.get("/usuarios", async (req, res) => {
+app.post("/animais", async(req,res) => {
   try {
-    const usuarios = await Usuario.findAll({
-      attributes: {
-        exclude: ["senha", "createdAt", "updatedAt"]
-      },
-      include: [
-        {
-          model: Questionario,
-          as: "questionario",
-          attributes: {
-            exclude: ["createdAt", "updatedAt"]
-          }
-        }
-      ]
-    });
+    const {
+      nome,
+      especie,
+      porte,
+      castrado,
+      vacinado,
+      descricao,
+      foto // deve ser uma string base64'
+    } = req.body;
 
-    return res.status(200).json({
-      total: usuarios.length,
-      data: usuarios
-    });
-
+    //campos obrigatórios
+    if (
+      !nome ||
+      !especie ||
+      !porte ||
+      !castrado ||
+      !vacinado ||
+      !descricao
+    ) {
+      return res.status(400).json({ erro: "Todos os campos obrigatórios devem ser preenchidos corretamente." });
+    }
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ erro: "Erro ao buscar usuários" });
+      console.error(err);
+      return res.status(500).json({ erro: "Erro interno ao cadastrar o animal." });
   }
+
+  //Verifica se a base64 é valida
+  let fotoBuffer = null;
+  if (foto) {
+    try {
+      fotoBuffer = Buffer.from(foto, 'base64');
+    } catch (err) {
+      erros.push("Campo 'foto' não é um base64 válido.");
+    }
+  }
+
+  const novoAnimal = {
+    id: uuidv4(),
+    nome,
+    especie,
+    porte,
+    castrado: castrado === true || castrado === false, //assumindo que a entrada vai ser com base entre escolher uma opção true ou false (boolean) para a variavel castrado
+    vacinado: vacinado === true || vacinado === false, //assumindo que a entrada vai ser com base entre escolher uma opção true ou false (boolean) para a variavel vacinado
+    descricao,
+    foto: fotoBuffer
+  };
+
+  animais.push(novoAnimal);
+
+  res.status(201).json({
+    mensagem: 'Animal cadastrado com sucesso!',
+    animal: { ...novoAnimal, foto: `Buffer com ${fotoBuffer.length} bytes` }
+  });
 });
 
 // ROUTES
