@@ -7,8 +7,8 @@ import encryptjs from "encryptjs";
 done:
 1 - yes - tested and it seems to work
 2 - yes - tested amd ot seems to work
-3 - yes
-4 - yes
+3 - yes - tested and it seems to work
+4 - yes - tested it and it seems to work
 5 - yes
 6 - yes
 7 - yes
@@ -1072,7 +1072,7 @@ async function init() {
 
   try {
     console.log("AAA\n\n\nAAA\n\n");
-    const teste = await Usuario.findOne({where: {nome_completo: "mohamed bomber"}});
+    const teste = await Animal.findOne({where: {nome: "Totó"}});
     if (teste) console.log("hey boy\n\n" + teste.id);
   } catch (err) {
     console.error("Erro buscando Totó:", err);
