@@ -9,20 +9,13 @@ done:
 2 - yes - tested amd ot seems to work
 3 - yes - tested and it seems to work
 4 - yes - tested it and it seems to work
-5 - yes
-6 - yes
-7 - yes
-8 - yes
-2 - yes
-3 - yes
-4 - yes
-5 - yes
-6 - yes
-7 - yes
-8 - yes
-9 - yes
-10 - yes
-11 - yes
+5 - yes - tested and it works
+6 - yes - tested and it works
+7 - yes - tested and it works
+8 - yes - tested amd it worksx
+9 - yes - tested and it works
+10 - yes - tested and it works
+11 - yes - 
 12 - yes
 */
 
@@ -846,7 +839,7 @@ app.delete("/admin/animais/:id", async (req, res) => {
     console.error(err);
     return res.status(500).json({"erro": "Erro ao remover animal"});
   }
-})
+});
 
 // 10
 app.get("/animais/:id", async (req, res) => {
@@ -928,11 +921,11 @@ app.post('/doacoes', async (req, res) => {
     console.log(err);
     return res.status(500).json({"erro": "Erro ao processar a doação"});
   }
-})
+});
 
 // init seeds sequelize
 // it also has the test shit
-// isso vai ser removido quando eu terminar de testar, by the way
+// nvm i said it was going to be removed but it will be useful for presenting in venturus type shit
 async function init() {
   const sequelize = (Usuario && Usuario.sequelize) || (Animal && Animal.sequelize) || (PedidoAdocao && PedidoAdocao.sequelize) || null;
 
@@ -960,7 +953,8 @@ async function init() {
   } catch (err) {
     console.error("Erro na seed Animal.create:", err);
   }
-
+  
+  // faz a seed 
   try {
     const encryptedSenha = encrypt("daora", secretKey, 256)
 
