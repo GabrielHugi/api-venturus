@@ -6,7 +6,7 @@ import encryptjs from "encryptjs";
 /*
 done:
 1 - yes - tested and it seems to work
-2 - yes
+2 - yes - tested amd ot seems to work
 3 - yes
 4 - yes
 5 - yes
@@ -203,12 +203,107 @@ app.post("/usuarios", async (req, res) => {
     });
 
     // Criar questionário, se enviado e válido
-    if (questionario) {
-      await Questionario.create({
-        ...questionario,
-        usuarioId: novoUsuario.id
-      });
+
+    const {
+      usuarioId, // id do tutor para associar
+      empregado,
+      quantos_animais_possui,
+      motivos_para_adotar,
+      quem_vai_sustentar_o_animal,
+      numero_adultos_na_casa,
+      numero_criancas_na_casa,
+      idades_criancas,
+      residencia_tipo,
+      proprietario_permite_animais,
+      todos_de_acordo_com_adocao,
+      responsavel_pelo_animal,
+      responsavel_concorda_com_adocao,
+      ha_alergico_ou_pessoas_que_nao_gostam,
+      gasto_mensal_estimado,
+      valor_disponivel_no_orcamento,
+      tipo_alimentacao,
+      local_que_o_animal_vai_ficar,
+      forma_de_permanencia,
+      forma_de_confinamento,
+      tera_brinquedos,
+      tera_abrigo,
+      tera_passeios_acompanhado,
+      tera_passeios_sozinho,
+      companhia_outro_animal,
+      companhia_humana_24h,
+      companhia_humana_parcial,
+      sem_companhia_humana,
+      sem_companhia_animal,
+      o_que_faz_em_viagem,
+      o_que_faz_se_fugir,
+      o_que_faz_se_nao_puder_criar,
+      animais_que_ja_criou,
+      destino_animais_anteriores,
+      costuma_esterilizar,
+      costuma_vacinar,
+      costuma_vermifugar,
+      veterinario_usual,
+      forma_de_educar,
+      envia_fotos_e_videos_do_local,
+      aceita_visitas_e_fotos_do_animal,
+      topa_entrar_grupo_adotantes,
+      concorda_com_taxa_adocao,
+      data_disponivel_para_buscar_animal
+    } = questionario;
+
+
+    if (
+      !usuarioId ||
+      typeof empregado !== 'boolean' ||
+      !quantos_animais_possui ||
+      !motivos_para_adotar ||
+      !quem_vai_sustentar_o_animal ||
+      !numero_adultos_na_casa ||
+      !numero_criancas_na_casa ||
+      !(Array.isArray(idades_criancas) && idades_criancas.length > 0) ||
+      !residencia_tipo ||
+      typeof proprietario_permite_animais !== 'boolean' ||
+      typeof todos_de_acordo_com_adocao !== 'boolean' ||
+      !responsavel_pelo_animal ||
+      typeof responsavel_concorda_com_adocao !== 'boolean' ||
+      typeof ha_alergico_ou_pessoas_que_nao_gostam !== 'boolean' ||
+      !gasto_mensal_estimado ||
+      typeof valor_disponivel_no_orcamento !== 'boolean' ||
+      !tipo_alimentacao ||
+      !local_que_o_animal_vai_ficar ||
+      !forma_de_permanencia ||
+      !forma_de_confinamento ||
+      typeof tera_brinquedos !== 'boolean' ||
+      typeof tera_abrigo !== 'boolean' ||
+      typeof tera_passeios_acompanhado !== 'boolean' ||
+      typeof tera_passeios_sozinho !== 'boolean' ||
+      typeof companhia_outro_animal !== 'boolean' ||
+      typeof companhia_humana_24h !== 'boolean' ||
+      typeof companhia_humana_parcial !== 'boolean' ||
+      typeof sem_companhia_humana !== 'boolean' ||
+      typeof sem_companhia_animal !== 'boolean' ||
+      !o_que_faz_em_viagem ||
+      !o_que_faz_se_fugir ||
+      !o_que_faz_se_nao_puder_criar ||
+      !animais_que_ja_criou ||
+      !destino_animais_anteriores ||
+      typeof costuma_esterilizar !== 'boolean' ||
+      typeof costuma_vacinar !== 'boolean' ||
+      typeof costuma_vermifugar !== 'boolean' ||
+      !veterinario_usual ||
+      !forma_de_educar ||
+      typeof envia_fotos_e_videos_do_local !== 'boolean' ||
+      typeof aceita_visitas_e_fotos_do_animal !== 'boolean' ||
+      typeof topa_entrar_grupo_adotantes !== 'boolean' ||
+      typeof concorda_com_taxa_adocao !== 'boolean' ||
+      !data_disponivel_para_buscar_animal
+    ) {
+      return res.status(400).json({ erro: "Todos os campos obrigatórios do questionário devem ser preenchidos corretamente." });
     }
+    await Questionario.create({
+      ...questionario,
+      usuarioId: novoUsuario.id
+    });
 
     return res.status(201).json({
       id: novoUsuario.id,
@@ -232,6 +327,7 @@ app.post("/usuarios", async (req, res) => {
 
 // Ainda parte do 2 POST /questionario
 app.post("/questionario", async (req, res) => {
+  console.log(req.body);
   try {
     const {
       usuarioId, // id do tutor para associar
@@ -280,60 +376,61 @@ app.post("/questionario", async (req, res) => {
       data_disponivel_para_buscar_animal
     } = req.body;
 
+    if (
+      !usuarioId ||
+      typeof empregado !== 'boolean' ||
+      !quantos_animais_possui ||
+      !motivos_para_adotar ||
+      !quem_vai_sustentar_o_animal ||
+      !numero_adultos_na_casa ||
+      !numero_criancas_na_casa ||
+      !(Array.isArray(idades_criancas) && idades_criancas.length > 0) ||
+      !residencia_tipo ||
+      typeof proprietario_permite_animais !== 'boolean' ||
+      typeof todos_de_acordo_com_adocao !== 'boolean' ||
+      !responsavel_pelo_animal ||
+      typeof responsavel_concorda_com_adocao !== 'boolean' ||
+      typeof ha_alergico_ou_pessoas_que_nao_gostam !== 'boolean' ||
+      !gasto_mensal_estimado ||
+      typeof valor_disponivel_no_orcamento !== 'boolean' ||
+      !tipo_alimentacao ||
+      !local_que_o_animal_vai_ficar ||
+      !forma_de_permanencia ||
+      !forma_de_confinamento ||
+      typeof tera_brinquedos !== 'boolean' ||
+      typeof tera_abrigo !== 'boolean' ||
+      typeof tera_passeios_acompanhado !== 'boolean' ||
+      typeof tera_passeios_sozinho !== 'boolean' ||
+      typeof companhia_outro_animal !== 'boolean' ||
+      typeof companhia_humana_24h !== 'boolean' ||
+      typeof companhia_humana_parcial !== 'boolean' ||
+      typeof sem_companhia_humana !== 'boolean' ||
+      typeof sem_companhia_animal !== 'boolean' ||
+      !o_que_faz_em_viagem ||
+      !o_que_faz_se_fugir ||
+      !o_que_faz_se_nao_puder_criar ||
+      !animais_que_ja_criou ||
+      !destino_animais_anteriores ||
+      typeof costuma_esterilizar !== 'boolean' ||
+      typeof costuma_vacinar !== 'boolean' ||
+      typeof costuma_vermifugar !== 'boolean' ||
+      !veterinario_usual ||
+      !forma_de_educar ||
+      typeof envia_fotos_e_videos_do_local !== 'boolean' ||
+      typeof aceita_visitas_e_fotos_do_animal !== 'boolean' ||
+      typeof topa_entrar_grupo_adotantes !== 'boolean' ||
+      typeof concorda_com_taxa_adocao !== 'boolean' ||
+      !data_disponivel_para_buscar_animal
+    ) {
+      return res.status(400).json({ erro: "Todos os campos obrigatórios devem ser preenchidos corretamente." });
+    }
+    
+
+    
     // Verifica se o usuário existe
     const usuario = await Usuario.findByPk(usuarioId);
     if (!usuario) {
       return res.status(400).json({ erro: "Usuário não encontrado." });
-    }
-
-    if (
-      !usuarioId  ||
-      !empregado  ||
-      !quantos_animais_possui  ||
-      !motivos_para_adotar  ||
-      !quem_vai_sustentar_o_animal  ||
-      !numero_adultos_na_casa  ||
-      !numero_criancas_na_casa  ||
-      !idades_criancas  ||
-      !residencia_tipo  ||
-      !proprietario_permite_animais  ||
-      !todos_de_acordo_com_adocao  ||
-      !responsavel_pelo_animal  ||
-      !responsavel_concorda_com_adocao  ||
-      !ha_alergico_ou_pessoas_que_nao_gostam  ||
-      !gasto_mensal_estimado  ||
-      !valor_disponivel_no_orcamento  ||
-      !tipo_alimentacao  ||
-      !local_que_o_animal_vai_ficar  ||
-      !forma_de_permanencia  ||
-      !forma_de_confinamento  ||
-      !tera_brinquedos  ||
-      !tera_abrigo  ||
-      !tera_passeios_acompanhado  ||
-      !tera_passeios_sozinho  ||
-      !companhia_outro_animal  ||
-      !companhia_humana_24h  ||
-      !companhia_humana_parcial  ||
-      !sem_companhia_humana  ||
-      !sem_companhia_animal  ||
-      !o_que_faz_em_viagem  ||
-      !o_que_faz_se_fugir  ||
-      !o_que_faz_se_nao_puder_criar  ||
-      !animais_que_ja_criou  ||
-      !destino_animais_anteriores  ||
-      !costuma_esterilizar  ||
-      !costuma_vacinar  ||
-      !costuma_vermifugar  ||
-      !veterinario_usual  ||
-      !forma_de_educar  ||
-      !envia_fotos_e_videos_do_local  ||
-      !aceita_visitas_e_fotos_do_animal  ||
-      !topa_entrar_grupo_adotantes  ||
-      !concorda_com_taxa_adocao  ||
-      !data_disponivel_para_buscar_animal
-      
-    ) {
-      return res.status(400).json({ erro: "Todos os campos obrigatórios devem ser preenchidos corretamente." });
     }
 
     const questionarioCriado = await Questionario.create({
@@ -835,6 +932,7 @@ app.post('/doacoes', async (req, res) => {
 
 // init seeds sequelize
 // it also has the test shit
+// isso vai ser removido quando eu terminar de testar, by the way
 async function init() {
   const sequelize = (Usuario && Usuario.sequelize) || (Animal && Animal.sequelize) || (PedidoAdocao && PedidoAdocao.sequelize) || null;
 
@@ -884,12 +982,12 @@ async function init() {
     const encryptedSenha = encrypt("daora", secretKey, 256)
 
     await Usuario.create({
-      nome_completo: "Joana Silva",
-      email: "<jono@email.com>",
+      nome_completo: "mohamed bomber",
+      email: "<osama@email.com>",
       senha: encryptedSenha,
-      cidade: "São Paulo",
-      estado: "SP",
-      idade: 25,
+      cidade: "afeganistão",
+      estado: "sei lá caverna",
+      idade: 999,
       telefone: "11999999999",
       administrador: false
     });
@@ -973,7 +1071,8 @@ async function init() {
   }
 
   try {
-    const teste = await Usuario.findOne({where: {nome_completo: "Teste User"}});
+    console.log("AAA\n\n\nAAA\n\n");
+    const teste = await Usuario.findOne({where: {nome_completo: "mohamed bomber"}});
     if (teste) console.log("hey boy\n\n" + teste.id);
   } catch (err) {
     console.error("Erro buscando Totó:", err);
