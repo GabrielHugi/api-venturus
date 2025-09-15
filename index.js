@@ -502,6 +502,7 @@ app.get("/animais", async (req, res) => {
     const { especie, porte, castrado, vacinado } = req.query;
 
     const filtros = {};
+    filtros.adotado = false;
     if (especie) filtros.especie = especie;
     if (porte) filtros.porte = porte;
     if (castrado !== undefined) filtros.castrado = castrado === "true";
@@ -523,7 +524,7 @@ app.get("/animais", async (req, res) => {
       order: [["createdAt", "ASC"]], // mais antigo → mais recente
     });
 
-    return res.status(200).json({
+    return res.status(201).json({
       data: animais.map((a) => ({
         id: a.id,
         nome: a.nome,
