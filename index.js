@@ -2,6 +2,7 @@ import express from 'express';
 import QRCode from 'qrcode';
 import { Animal, Doacao, Questionario, PedidoAdocao, Usuario } from './models/Modelos.js';
 import encryptjs from "encryptjs";
+import e from 'express';
 
 /*
 done:
@@ -15,12 +16,12 @@ done:
 8 - yes - tested amd it worksx
 9 - yes - tested and it works
 10 - yes - tested and it works
-11 - yes - 
-12 - yes
+11 - yes - i reember i tested htis probably but forgot to log
+12 - yes - same for this
 */
 
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 const PIX = "00020126580014BR.GOV.BCB.PIX0136chavepix-ficticia@exemplo.com5204000053039865405100.005802BR5920Nome Exemplo Fictício6009Sao Paulo62070503***6304ABCD";
 var PIXQR = '';
 const encrypt = encryptjs.encrypt;
@@ -31,7 +32,10 @@ const secretKey = "very very secret secretive secretus";
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+
 // HELPERS
+// verifica se o id é válido
 function isValidUUID(uuid) {
   if (!uuid || typeof uuid !== 'string') return false;
   const re = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
@@ -63,6 +67,7 @@ async function requireAdmin(email, senha) {
   return { ok: true, user };
 }
 
+// essa função eu usei para testar
 async function getRandomUserByName() {
   try {
     const users = await Usuario.findAll({
@@ -81,15 +86,15 @@ async function getRandomUserByName() {
   }
 }
 
-getRandomUserByName().then(user => {
-  if (!user) {
-    console.log("No users found with that name.");
-  } else {
-    console.log("Random user:", user.toJSON());
-  }
-});
 
-// ROUTES
+
+/*
+* ROUTES
+*
+*
+*
+*
+*/
 
 // 1 POST animais
 app.post("/animais", async(req,res) => {
@@ -177,7 +182,7 @@ app.post("/usuarios", async (req, res) => {
     }
 
     // Verificar email único
-    const emailExistente = await Usuario.findOne({ where: { email } });
+    const emailExistente = await getUserByEmail(email);
     if (emailExistente) {
       return res.status(400).json({ erro: "Email preenchido já está sendo utilizado." });
     }
@@ -923,9 +928,8 @@ app.post('/doacoes', async (req, res) => {
   }
 });
 
-// init seeds sequelize
-// it also has the test shit
-// nvm i said it was going to be removed but it will be useful for presenting in venturus type shit
+// init seeds sequelize with the root user cuz asked to
+// removed the bs 
 async function init() {
   const sequelize = (Usuario && Usuario.sequelize) || (Animal && Animal.sequelize) || (PedidoAdocao && PedidoAdocao.sequelize) || null;
 
@@ -940,136 +944,21 @@ async function init() {
     console.warn("Nenhum sequelize disponível nos modelos importados. Seeds podem falhar.");
   }
 
-  try {
-    await Animal.create({
-      nome: "Totó",
-      especie: "Cachorro",
-      porte: "Médio",
-      castrado: true,
-      vacinado: true,
-      adotado: false,
-      descricao: "Um cachorro muito amigável e brincalhão.",
-    });
-  } catch (err) {
-    console.error("Erro na seed Animal.create:", err);
-  }
-  
-  // faz a seed 
-  try {
-    const encryptedSenha = encrypt("daora", secretKey, 256)
-
+  // seed
+  if (getUserByEmail("<hugi@gmail.com>") == null) try {
+    const encryptedSenha = encrypt("sigma", secretKey, 256)
     await Usuario.create({
-      nome_completo: "Hugi based",
+      nome_completo: "Hugi",
       email: "<hugi@gmail.com>",
       senha: encryptedSenha,
-      cidade: "São Paulo",
-      estado: "SP",
+      cidade: "Terra dos sigmas",
+      estado: "SigmaLandia",
       idade: 25,
       telefone: "11999999999",
       administrador: true
     });
   } catch (err) {
-    console.error("Erro na seed Usuario.create (Hugi):", err);
-  }
-
-  try {
-    const encryptedSenha = encrypt("daora", secretKey, 256)
-
-    await Usuario.create({
-      nome_completo: "mohamed bomber",
-      email: "<osama@email.com>",
-      senha: encryptedSenha,
-      cidade: "afeganistão",
-      estado: "sei lá caverna",
-      idade: 999,
-      telefone: "11999999999",
-      administrador: false
-    });
-  } catch (err) {
-    console.error("Erro na seed Usuario.create (Joana):", err);
-  }
-
-  try {
-    const usuario = await Usuario.findOne({
-      where: {
-        email: '<jono@email.com>'
-      }
-    });
-
-    if (!usuario) {
-      console.error("Usuário não encontrado para vincular ao questionário.");
-    } else {
-      const questionario = await Questionario.create({
-        usuarioId: usuario.id,
-        empregado: true,
-        quantos_animais_possui: 2,
-        motivos_para_adotar: "Procurando um animal de estimação",
-        quem_vai_sustentar_o_animal: "Eu",
-        numero_adultos_na_casa: 2,
-        numero_criancas_na_casa: 1,
-        idades_criancas: [5],
-        residencia_tipo: "Casa",
-        proprietario_permite_animais: true,
-        todos_de_acordo_com_adocao: true,
-        responsavel_pelo_animal: "Joana Silva",
-        responsavel_concorda_com_adocao: true,
-        ha_alergico_ou_pessoas_que_nao_gostam: false,
-        gasto_mensal_estimado: 500,
-        valor_disponivel_no_orcamento: true,
-        tipo_alimentacao: "Ração seca",
-        local_que_o_animal_vai_ficar: "Quarto",
-        forma_de_permanencia: "Livre",
-        forma_de_confinamento: "Cercado",
-        tera_brinquedos: true,
-        tera_abrigo: true,
-        tera_passeios_acompanhado: true,
-        tera_passeios_sozinho: false,
-        companhia_outro_animal: true,
-        companhia_humana_24h: true,
-        companhia_humana_parcial: false,
-        sem_companhia_humana: false,
-        sem_companhia_animal: false,
-        o_que_faz_em_viagem: "Levar para um hotel de animais",
-        o_que_faz_se_fugir: "Procurar e chamar",
-        o_que_faz_se_nao_puder_criar: "Buscar um novo lar",
-        animais_que_ja_criou: "Cachorros e gatos",
-        destino_animais_anteriores: "Adotados com sucesso",
-        costuma_esterilizar: true,
-        costuma_vacinar: true,
-        costuma_vermifugar: true,
-        veterinario_usual: "Veterinário local",
-        forma_de_educar: "Comando positivo",
-        envia_fotos_e_videos_do_local: true,
-        aceita_visitas_e_fotos_do_animal: true,
-        topa_entrar_grupo_adotantes: true,
-        concorda_com_taxa_adocao: true,
-        data_disponivel_para_buscar_animal: "2025-09-01"
-      });
-
-      console.log("Questionário criado e vinculado ao usuário Joana Silva:", questionario.toJSON());
-    }
-  } catch (err) {
-    console.error("Erro criando Questionario:", err);
-  }
-
-  try {
-    await Doacao.create({
-      nome: "Maria Oliveira",
-      email: "<jono@email.com>",
-      valor: 200.50,
-      linkPix: "1234567890abcdef",
-      mensagem: "Gostaria de ajudar na adoção de animais"
-    });
-  } catch (err) {
-    console.error("Erro na seed Doacao.create:", err);
-  }
-
-  try {
-    console.log("AAA\n\n\nAAA\n\n");
-    const teste = await Animal.findOne({where: {nome: "Totó"}});
-    if (teste) console.log("hey boy\n\n" + teste.id);
-  } catch (err) {
-    console.error("Erro buscando Totó:", err);
+    console.error("SEED NOT WORK MAN!!!! AAAAAAAA!!", err);
   }
 
   try {
