@@ -1,8 +1,9 @@
 import '../../functions/helpers.js';
 import express from 'express';
-const app = express();
+import { getUserByEmail, safeDecrypt } from '../../functions/helpers.js';
+const router = express.Router();
 
-app.post('/autenticacao', async (req, res) => {
+router.post('/autenticacao', async (req, res) => {
   try {
     const { email, senha } = req.body;
     if (!email|| !senha) return res.status(400).json({"erro": "Missing email and or password in request body"});
@@ -19,3 +20,5 @@ app.post('/autenticacao', async (req, res) => {
     return res.status(500).json({ erro: "Erro interno ao tentar fazer o login." });
   }
 });
+
+export default router;

@@ -1,13 +1,13 @@
-import '../../functions/helpers.js';
+import { isValidUUID, getUserByEmail, safeDecrypt, requireAdmin } from '../../functions/helpers.js';
 import { Animal, PedidoAdocao } from '../../../models/Modelos.js';
 import encryptjs from "encryptjs";
 const encrypt = encryptjs.encrypt;
 const decrypt = encryptjs.decrypt;
 import express from 'express';
-const app = express();
+const router = express.Router();
 
 
-app.post("/animais", async(req,res) => {
+router.post("/animais", async(req,res) => {
   try {
     const {
       nome,
@@ -61,7 +61,7 @@ app.post("/animais", async(req,res) => {
   }
 });
 
-app.get("/animais", async (req, res) => {
+router.get("/animais", async (req, res) => {
   try {
     const { especie, porte, castrado, vacinado } = req.query;
 
@@ -108,7 +108,7 @@ app.get("/animais", async (req, res) => {
   }
 });
 
-app.get("/admin/animais", async (req, res) => {
+router.get("/admin/animais", async (req, res) => {
   try {
     const { email, senha } = req.query;
     if (!email || !senha) {
@@ -164,7 +164,7 @@ app.get("/admin/animais", async (req, res) => {
   }
 });
 
-app.get("/animais/:id", async (req, res) => {
+router.get("/animais/:id", async (req, res) => {
   try {
     const {email, senha} = req.query; const {id} = req.params;
     if (!id) return res.status(400).send({"erro": "Inclua o ID do animal na rota"});
@@ -194,7 +194,7 @@ app.get("/animais/:id", async (req, res) => {
   }
 });
 
-app.patch("/admin/animais/:id", async (req, res) => {
+router.patch("/admin/animais/:id", async (req, res) => {
   try {
     const { email, senha, ...dados } = req.body;
     const { id } = req.params;
@@ -244,7 +244,7 @@ app.patch("/admin/animais/:id", async (req, res) => {
   }
 });
 
-app.delete("/admin/animais/:id", async (req, res) => {
+router.delete("/admin/animais/:id", async (req, res) => {
   try {
     const {email, senha} = req.body; const {id} = req.params;
 
@@ -270,3 +270,5 @@ app.delete("/admin/animais/:id", async (req, res) => {
     return res.status(500).json({"erro": "Erro ao remover animal"});
   }
 });
+
+export default router;

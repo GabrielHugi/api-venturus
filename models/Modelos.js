@@ -1,14 +1,9 @@
-import { Sequelize } from 'sequelize';
+import sequelize from '../src/connections/db/index.js';
 import AnimalModel from './Animal.js';
 import UsuarioModel from './Usuario.js';
 import QuestionarioModel from './Questionario.js';
 import PedidoAdocaoModel from './PedidoAdocao.js';
 import DoacaoModel from './Doacao.js';
-
-export const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: './database.sqlite',
-});
 
 export const Animal = AnimalModel(sequelize);
 export const Usuario = UsuarioModel(sequelize);

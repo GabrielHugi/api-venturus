@@ -1,16 +1,16 @@
 import QRCode from 'qrcode';
 import { config } from 'dotenv';
-import '../../functions/helpers.js';
+import { isValidUUID, getUserByEmail, safeDecrypt, requireAdmin } from '../../functions/helpers.js';
 import { Questionario, Usuario } from '../../../models/Modelos.js';
 import encryptjs from "encryptjs";
 const encrypt = encryptjs.encrypt;
 import express from 'express';
-const app = express();
+const router = express.Router();
 
 config();
 const secretKey = process.env.SECRET_KEY;
 
-app.post("/usuarios", async (req, res) => {
+router.post("/usuarios", async (req, res) => {
   try {
     const {
       nome_completo,
@@ -180,7 +180,7 @@ app.post("/usuarios", async (req, res) => {
   }
 });
 
-app.post("/questionario", async (req, res) => {
+router.post("/questionario", async (req, res) => {
   console.log(req.body);
   try {
     const {
@@ -342,7 +342,7 @@ app.post("/questionario", async (req, res) => {
   }
 });
 
-app.patch("/tutores/:id", async (req, res) => {
+router.patch("/tutores/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { authEmail, authSenha, ...dadosAtualizacao } = req.body;
@@ -418,7 +418,7 @@ app.patch("/tutores/:id", async (req, res) => {
   }
 });
 
-app.get("/tutores/:id", async (req, res) => {
+router.get("/tutores/:id", async (req, res) => {
   try {
     const {id} = req.params;
     if (!id) return res.status(400).send({"erro": "Inclua o ID do tutor na rota"});
@@ -444,3 +444,4 @@ app.get("/tutores/:id", async (req, res) => {
   }
 });
 
+export default router;

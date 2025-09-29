@@ -1,11 +1,11 @@
 import QRCode from 'qrcode';
-import '../../functions/helpers.js';
+import { isValidUUID } from '../../functions/helpers.js';
 import { Animal, Doacao, Questionario, PedidoAdocao, Usuario } from '../../../models/Modelos.js';
 import encryptjs from "encryptjs";
 import express from 'express';
-const app = express();
+const router = express.Router();
 
-app.post("/adocoes", async (req, res) => {
+router.post("/adocoes", async (req, res) => {
   try {
     const { tutorEmail, animalId } = req.body;
 
@@ -71,7 +71,7 @@ app.post("/adocoes", async (req, res) => {
   }
 });
 
-app.post('/doacoes', async (req, res) => {
+router.post('/doacoes', async (req, res) => {
   try {
     const {nome, email, valor, mensagem} = req.body;
     
@@ -101,3 +101,5 @@ app.post('/doacoes', async (req, res) => {
     return res.status(500).json({"erro": "Erro ao processar a doação"});
   }
 });
+
+export default router;

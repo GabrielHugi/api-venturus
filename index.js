@@ -1,12 +1,14 @@
 import express from 'express';
 import QRCode from 'qrcode';
+import sequelize from './src/connections/db/index.js';
 import { config } from 'dotenv';
 import { Animal, Doacao, Questionario, PedidoAdocao, Usuario } from './models/Modelos.js';
+import {getUserByEmail} from './src/functions/helpers.js';
 import encryptjs from "encryptjs";
-import * as adocoes from "./src/routes/adocoes/index.js"
-import * as animais from "./src/routes/animais/index.js"
-import * as autenticacao from "./src/routes/autenticacao/index.js"
-import * as usuarios from "./src/routes/usuarios/index.js"
+import adocoes from "./src/routes/adocoes/index.js"
+import animais from "./src/routes/animais/index.js"
+import autenticacao from "./src/routes/autenticacao/index.js"
+import usuarios from "./src/routes/usuarios/index.js"
 
 config();
 const app = express();
