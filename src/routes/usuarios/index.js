@@ -10,7 +10,7 @@ const router = express.Router();
 config();
 const secretKey = process.env.SECRET_KEY;
 
-router.post("/usuarios", async (req, res) => {
+router.post("/usuario", async (req, res) => {
   try {
     const {
       nome_completo,
@@ -43,12 +43,12 @@ router.post("/usuarios", async (req, res) => {
       return res.status(400).json({ erro: "Email preenchido já está sendo utilizado." });
     }
 
-    encrypt(senha, secretKey, 256);
+    let newsenha = encrypt(senha, secretKey, 256);
 
     // Criar usuário
     const novoUsuario = await Usuario.create({
       nome_completo,
-      senha,
+      senha : newsenha,
       email,
       cidade,
       estado,
@@ -237,8 +237,9 @@ router.post("/questionario", async (req, res) => {
       !motivos_para_adotar ||
       !quem_vai_sustentar_o_animal ||
       !numero_adultos_na_casa ||
-      !numero_criancas_na_casa ||
-      !(Array.isArray(idades_criancas) && idades_criancas.length > 0) ||
+      numero_criancas_na_casa == null ||
+      // mudar depois as verificações de numeros de ! para == null
+      !(Array.isArray(idades_criancas)) ||
       !residencia_tipo ||
       typeof proprietario_permite_animais !== 'boolean' ||
       typeof todos_de_acordo_com_adocao !== 'boolean' ||
