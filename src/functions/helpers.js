@@ -1,4 +1,11 @@
 import {Usuario } from '../../models/Modelos.js';
+import { config } from 'dotenv';
+import encryptjs from "encryptjs";
+const encrypt = encryptjs.encrypt;
+const decrypt = encryptjs.decrypt;
+
+config();
+const secretKey = process.env.SECRET_KEY;
 
 export function isValidUUID(uuid) {
   if (!uuid || typeof uuid !== 'string') return false;

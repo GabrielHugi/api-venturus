@@ -40,7 +40,7 @@ router.post("/animais", async(req,res) => {
       }
     }
 
-    const novoAnimal = Animal.create({
+    const novoAnimal = await Animal.create({
       nome,
       especie,
       porte,
@@ -50,10 +50,18 @@ router.post("/animais", async(req,res) => {
       foto: fotoBuffer
     });
 
-    res.status(201).json({
-      mensagem: 'Animal cadastrado com sucesso!',
-      animal: { ...novoAnimal, foto: `Buffer com ${fotoBuffer.length} bytes` }
-    });
+    if (foto != null) {
+      res.status(201).json({
+        mensagem: 'Animal cadastrado com sucesso!',
+        animal: { ...novoAnimal, foto: `Buffer com ${fotoBuffer.length} bytes` }
+      });
+    }
+    else {
+      res.status(201).json({
+        mensagem: 'Animal cadastrado com sucesso!',
+        animal: { ...novoAnimal}
+      });
+    }
   } catch (err) {
       console.error(err);
       return res.status(500).json({ erro: "Erro interno ao cadastrar o animal." });

@@ -50,7 +50,7 @@ async function init() {
   }
 
   // seed
-  if (getUserByEmail("<hugi@gmail.com>") == null) try {
+  if (await getUserByEmail("<hugi@gmail.com>") == null) try {
     const encryptedSenha = encrypt("sigma", secretKey, 256)
     await Usuario.create({
       nome_completo: "Hugi",

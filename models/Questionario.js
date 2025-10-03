@@ -8,6 +8,11 @@ export default (sequelize) => {
             primaryKey: true,
             allowNull: false
         },
+        usuarioId: {
+            type: DataTypes.UUID, 
+            allowNull: false,
+            unique: true
+        },
         empregado: {
             type: DataTypes.BOOLEAN,
             allowNull: true
