@@ -6,6 +6,7 @@ import { Animal, Doacao, Questionario, PedidoAdocao, Usuario } from './models/Mo
 import {getUserByEmail} from './src/functions/helpers.js';
 import encryptjs from "encryptjs";
 import adocoes from "./src/routes/adocoes/index.js"
+import doacoes from "./src/routes/doacoes/index.js"
 import animais from "./src/routes/animais/index.js"
 import autenticacao from "./src/routes/autenticacao/index.js"
 import usuarios from "./src/routes/usuarios/index.js"
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // rotas
 app.use(adocoes);
+app.use(doacoes);
 app.use(animais);
 app.use(autenticacao);
 app.use(usuarios);
@@ -63,7 +65,7 @@ async function init() {
       administrador: true
     });
   } catch (err) {
-    console.error("SEED NOT WORK MAN!!!! AAAAAAAA!!", err);
+    console.error("Seed fail", err);
   }
 
   try {

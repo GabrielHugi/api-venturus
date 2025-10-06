@@ -1,4 +1,3 @@
-import QRCode from 'qrcode';
 import { isValidUUID } from '../../functions/helpers.js';
 import { Animal, Doacao, Questionario, PedidoAdocao, Usuario } from '../../../models/Modelos.js';
 import encryptjs from "encryptjs";
@@ -68,37 +67,6 @@ router.post("/adocoes", async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ erro: "Erro ao registrar o pedido de adoção" });
-  }
-});
-
-router.post('/doacoes', async (req, res) => {
-  try {
-    const {nome, email, valor, mensagem} = req.body;
-    
-    if (valor === undefined || valor === null || isNaN(Number(valor)) || Number(valor) <= 0) {
-      return res.status(400).json({"erro": "Valor da doação é obrigatório e deve ser um número positivo"});
-    }
-
-    const teste = await Doacao.create({
-      nome: nome,
-      email: email,
-      valor: valor,
-      mensagem: mensagem,
-      linkPix: PIX,
-    });
-
-    return res.status(201).json({
-      "doacao_id": teste.id,
-      "nome": teste.nome,
-      "valor": teste.valor,
-      "mensagem": teste.mensagem,
-      "linkPix": teste.linkPix,
-      "qrcode": PIXQR,
-    })
-
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({"erro": "Erro ao processar a doação"});
   }
 });
 
