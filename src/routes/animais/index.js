@@ -44,8 +44,8 @@ router.post("/animais", async(req,res) => {
       nome,
       especie,
       porte,
-      castrado: castrado === true || castrado === false, //assumindo que a entrada vai ser com base entre escolher uma opção true ou false (boolean) para a variavel castrado
-      vacinado: vacinado === true || vacinado === false, //assumindo que a entrada vai ser com base entre escolher uma opção true ou false (boolean) para a variavel vacinado
+      castrado, //assumindo que a entrada vai ser com base entre escolher uma opção true ou false (boolean) para a variavel castrado
+      vacinado,//assumindo que a entrada vai ser com base entre escolher uma opção true ou false (boolean) para a variavel vacinado
       descricao,
       foto: fotoBuffer
     });
