@@ -10,7 +10,11 @@ router.post('/doacoes', async (req, res) => {
     const {nome, email, valor, mensagem} = req.body;
     
     if (valor === undefined || valor === null || isNaN(Number(valor)) || Number(valor) <= 0) {
-      return res.status(400).json({"erro": "Valor da doação é obrigatório e deve ser um número positivo"});
+      return res.status(400).json({erro: "Valor da doação é obrigatório e deve ser um número positivo"});
+    }
+
+    if (!nome || !mensagem) {
+      return res.status(400).json({erro: "Nome ou mensagem não presentes"})
     }
 
     let PIXQR = await QRCode.toDataURL(PIX);
@@ -34,7 +38,7 @@ router.post('/doacoes', async (req, res) => {
 
   } catch (err) {
     console.log(err);
-    return res.status(500).json({"erro": "Erro ao processar a doação"});
+    return res.status(500).json({erro: "Erro ao processar a doação"});
   }
 });
 

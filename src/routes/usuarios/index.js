@@ -14,7 +14,7 @@ const secretKey = process.env.SECRET_KEY;
 function validateQuestionario(data) {
     const errors = [];
     if (!data) {
-        return { isValid: false, errors: ["O objeto 'questionario' não foi fornecido."] };
+        return { isValid: false, erros: ["O objeto 'questionario' não foi fornecido."] };
     }
 
     // integer não nulo
@@ -74,7 +74,7 @@ function validateQuestionario(data) {
 
     return {
         isValid: errors.length === 0,
-        errors: errors
+        erros: errors
     };
 }
 
@@ -116,7 +116,7 @@ router.post("/usuario", async (req, res) => {
     if (questionario) {
       const validationResult = validateQuestionario(questionario);
       if (!validationResult.isValid) {
-        return res.status(400).json({ erros: validationResult.errors });
+        return res.status(400).json({ erros: validationResult.erros });
       }
     }
     
@@ -175,7 +175,7 @@ router.post("/questionario", async (req, res) => {
 
     const validationResult = validateQuestionario(questionarioData);
     if (!validationResult.isValid) {
-        return res.status(400).json({ erros: validationResult.errors });
+        return res.status(400).json({ erros: validationResult.erros });
     }
     
     const usuario = await Usuario.findByPk(usuarioId);
@@ -280,7 +280,7 @@ router.patch("/tutores/:id", async (req, res) => {
 router.get("/tutores/:id", async (req, res) => {
   try {
     const {id} = req.params;
-    if (!id) return res.status(400).send({"erro": "Inclua o ID do tutor na rota"});
+    if (!id) return res.status(400).send({erro: "Inclua o ID do tutor na rota"});
     if (!isValidUUID(id)) return res.status(400).json({ erro: "ID do tutor inválido. Deve ser um UUID" });
 
     const user = await Usuario.findOne({
@@ -295,11 +295,11 @@ router.get("/tutores/:id", async (req, res) => {
       attributes: { exclude: ["createdAt", "updatedAt", "senha"] },
       order: [[{ model: Questionario, as: "questionario" }, "createdAt", "ASC"]],
     });
-    if (!user) return res.status(404).json({"erro": "Tutor não encontrado"});
+    if (!user) return res.status(404).json({erro: "Tutor não encontrado"});
     return res.status(200).json(user);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({"erro": "Erro ao buscar dados do tutor"})
+    return res.status(500).json({erro: "Erro ao buscar dados do tutor"})
   }
 });
 

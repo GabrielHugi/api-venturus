@@ -174,9 +174,9 @@ router.get("/admin/animais", async (req, res) => {
 router.get("/animais/:id", async (req, res) => {
   try {
     const {email, senha} = req.query; const {id} = req.params;
-    if (!id) return res.status(400).send({"erro": "Inclua o ID do animal na rota"});
+    if (!id) return res.status(400).send({erro: "Inclua o ID do animal na rota"});
     if (!isValidUUID(id)) return res.status(400).json({ erro: "ID do animal inválido. Deve ser um UUID" });
-    if (!email || !senha) return res.status(400).json({"erro": "Inclua email e senha na query da request"});
+    if (!email || !senha) return res.status(400).json({erro: "Inclua email e senha na query da request"});
 
     const auth = await requireAdmin(email, senha);
     if (!auth.ok) return res.status(auth.code).json({ erro: auth.erro });
@@ -193,11 +193,11 @@ router.get("/animais/:id", async (req, res) => {
       attributes: { exclude: ["createdAt", "updatedAt"] },
       order: [[{ model: PedidoAdocao, as: "pedidos" }, "createdAt", "ASC"]],
     });
-    if (!animal) return res.status(404).json({"erro": "Animal não encontrado"});
+    if (!animal) return res.status(404).json({erro: "Animal não encontrado"});
     return res.status(200).json(animal);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({"erro": "Erro ao achar animal"})
+    return res.status(500).json({erro: "Erro ao achar animal"})
   }
 });
 
@@ -255,13 +255,13 @@ router.delete("/admin/animais/:id", async (req, res) => {
   try {
     const {email, senha} = req.body; const {id} = req.params;
 
-    if (!id) return res.status(400).send({"erro": "Inclua o ID do animal na rota"});
+    if (!id) return res.status(400).send({erro: "Inclua o ID do animal na rota"});
     if (!isValidUUID(id)) return res.status(400).json({ erro: "ID do animal inválido. Deve ser um UUID" });
 
-    if (!email || !senha) return res.status(400).json({"erro": "Inclua email e senha no body da request"});
+    if (!email || !senha) return res.status(400).json({erro: "Inclua email e senha no body da request"});
 
     const animal = await Animal.findOne({where:{id: id}});
-    if (!animal) return res.status(404).json({"erro": "Animal não encontrado"});
+    if (!animal) return res.status(404).json({erro: "Animal não encontrado"});
 
     const user = await getUserByEmail(email);
     if (!user) return res.status(401).json({ erro: "Usuário não encontrado" });
@@ -274,7 +274,7 @@ router.delete("/admin/animais/:id", async (req, res) => {
     return res.status(204).end();
   } catch (err) {
     console.error(err);
-    return res.status(500).json({"erro": "Erro ao remover animal"});
+    return res.status(500).json({erro: "Erro ao remover animal"});
   }
 });
 
