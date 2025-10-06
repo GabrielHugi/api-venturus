@@ -30,7 +30,7 @@ router.post("/animais", async(req,res) => {
     ) {
       return res.status(400).json({ erro: "Todos os campos obrigatórios devem ser preenchidos corretamente." });
     }
-    //Verifica se a base64 é valida
+    //transforma de base 64 em buffer (bytes, no caso um arquivo de imagem). Se não for base 64 não consegue transformar e manda um erro, assim verificando se é ou não 
     let fotoBuffer = null;
     if (foto) {
       try {
